@@ -7,7 +7,7 @@ IjkxsDatas 插件为 typecho 采集辅助插件，支持免登录发布文章，
 ![](https://cdn.jsdelivr.net/gh/gogobody/blog-img/blogimg/20210212171133.png)
 
 ## 使用教程
-1. 插件后台的发布地址为API地址，例如图上：http://localhost/action/ijkxs-datas，密码为个人设置的接口调用通行证。
+1. 插件后台的发布地址为API地址，例如图上：http://localhost/action/ijkxs-datas ，密码为个人设置的接口调用通行证。
 2. Markdown 前缀功能使得采集的文章会被标记为Markdown 格式
 3. 本地图片替换，将采集的图片下载到本地，并将文章内容图片链接替换为本地链接。
 
