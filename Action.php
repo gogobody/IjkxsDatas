@@ -10,6 +10,10 @@ class IjkxsDatas_Action extends Typecho_Widget implements Widget_Interface_Do
      */
     private $db;
 
+    public function __construct($request, $response, $params = NULL)
+    {
+        parent::__construct($request, $response, $params);
+    }
 
     public function action()
     {
@@ -53,7 +57,7 @@ class IjkxsDatas_Action extends Typecho_Widget implements Widget_Interface_Do
 //                    $_REQ = $this->IjkdatasMergeRequest();
 //                    $loadImages = $this->downloadImages($_REQ);
 
-                    keydatas_successRsp(array("url" => $docUrl . "?p={$postId}" . "#相同标题文章已存在"));
+                    keydatas_successRsp(array("url" => $docUrl . "?p={$postId}"),"相同标题文章已存在");
 
                 }
             }
@@ -131,8 +135,11 @@ class IjkxsDatas_Action extends Typecho_Widget implements Widget_Interface_Do
 //                $randSlug = Typecho_Common::randString(6);
 //                $slug = empty($reqData['slug']) ? $randSlug : $reqData['slug'];
 //                $slug = Typecho_Common::slugName($slug, $postId);
-//                $this->db->query($this->db->update('table.contents')->rows(array('slug' => $slug))
-//                    ->where('cid = ?', $postId));
+                $this->db->query($this->db->update('table.contents')->rows(array('slug' => $slug))
+                    ->where('cid = ?', $postId));
+                /** 保存自定义字段 */
+
+                $this->applyFields($this->getFields(), $postId);
             } else {
                 keydatas_failRsp('1405', "add document failed", "新增文章失败");
             }
@@ -248,8 +255,134 @@ class IjkxsDatas_Action extends Typecho_Widget implements Widget_Interface_Do
             exit();
         }
 
-    }//..action end
+    }
+    //..action end
+    /**
+     * 检查字段名是否符合要求
+     *
+     * @param string $name
+     * @access public
+     * @return boolean
+     */
+    public function checkFieldName($name)
+    {
+        return preg_match("/^[_a-z][_a-z0-9]*$/i", $name);
+    }
+    /**
+     * 设置单个字段
+     *
+     * @param string $name
+     * @param string $type
+     * @param string $value
+     * @param integer $cid
+     * @access public
+     * @return integer
+     */
+    public function setField($name, $type, $value, $cid)
+    {
+        if (empty($name) || !$this->checkFieldName($name)
+            || !in_array($type, array('str', 'int', 'float'))) {
+            return false;
+        }
 
+        $exist = $this->db->fetchRow($this->db->select('cid')->from('table.fields')
+            ->where('cid = ? AND name = ?', $cid, $name));
+
+        if (empty($exist)) {
+            return $this->db->query($this->db->insert('table.fields')
+                ->rows(array(
+                    'cid'           =>  $cid,
+                    'name'          =>  $name,
+                    'type'          =>  $type,
+                    'str_value'     =>  'str' == $type ? $value : NULL,
+                    'int_value'     =>  'int' == $type ? intval($value) : 0,
+                    'float_value'   =>  'float' == $type ? floatval($value) : 0
+                )));
+        } else {
+            return $this->db->query($this->db->update('table.fields')
+                ->rows(array(
+                    'type'          =>  $type,
+                    'str_value'     =>  'str' == $type ? $value : NULL,
+                    'int_value'     =>  'int' == $type ? intval($value) : 0,
+                    'float_value'   =>  'float' == $type ? floatval($value) : 0
+                ))
+                ->where('cid = ? AND name = ?', $cid, $name));
+        }
+    }
+
+    /**
+     * 保存自定义字段
+     *
+     * @param array $fields
+     * @param mixed $cid
+     * @access public
+     * @return void
+     */
+    public function applyFields(array $fields, $cid)
+    {
+        $exists = array_flip(Typecho_Common::arrayFlatten($this->db->fetchAll($this->db->select('name')
+            ->from('table.fields')->where('cid = ?', $cid)), 'name'));
+
+        foreach ($fields as $name => $value) {
+            $type = 'str';
+
+            if (is_array($value) && 2 == count($value)) {
+                $type = $value[0];
+                $value = $value[1];
+            } else if (strpos($name, ':') > 0) {
+                list ($type, $name) = explode(':', $name, 2);
+            }
+
+            if (!$this->checkFieldName($name)) {
+                continue;
+            }
+
+            if (isset($exists[$name])) {
+                unset($exists[$name]);
+            }
+
+            $this->setField($name, $type, $value, $cid);
+        }
+
+        foreach ($exists as $name => $value) {
+            $this->db->query($this->db->delete('table.fields')
+                ->where('cid = ? AND name = ?', $cid, $name));
+        }
+    }
+
+    /**
+     * getFields
+     *
+     * @access protected
+     * @return array
+     */
+    protected function getFields()
+    {
+        $fields = array();
+        $fieldNames = $this->request->getArray('fieldNames');
+
+        if (!empty($fieldNames)) {
+            $data = array(
+                'fieldNames'    =>  $this->request->getArray('fieldNames'),
+                'fieldTypes'    =>  $this->request->getArray('fieldTypes'),
+                'fieldValues'   =>  $this->request->getArray('fieldValues')
+            );
+            foreach ($data['fieldNames'] as $key => $val) {
+                if (empty($val)) {
+                    continue;
+                }
+
+                $fields[$val] = array($data['fieldTypes'][$key], $data['fieldValues'][$key]);
+            }
+        }
+
+        $customFields = $this->request->getArray('fields');
+        if (!empty($customFields)) {
+            $fields = array_merge($fields, $customFields);
+        }
+
+        return $fields;
+    }
     /**
      * 获取文件完整路径
      * @return string

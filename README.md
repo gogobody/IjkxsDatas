@@ -54,5 +54,6 @@ POST参数：
 | allowComment| 默认1|否|
 | allowPing| 默认1|否|
 | allowFeed| 默认1|否|
+| fields[xxx] | 自定义字段xxx | 否 |
 
 
