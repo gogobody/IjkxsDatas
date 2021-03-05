@@ -37,6 +37,9 @@ http://localhost/action/ijkxs-datas
 接口地址+?__ijk_flag=post&ijk_password=xxx插件后台配置的
 ```
 POST参数：
+
+v1.0.1 新增 teapass 支持
+
 |  名称   | 值  | 是否必填|
 |  ----  | ----  | ----  |
 | categories  | 分类名称，多个可,分隔，不存在会自动创建 |是|
@@ -55,5 +58,10 @@ POST参数：
 | allowPing| 默认1|否|
 | allowFeed| 默认1|否|
 | fields[xxx] | 自定义字段xxx | 否 |
+| post_see_type|0:限时免费1:登录可见2:仅VIP会员可见3:要单独付费|否|
+| post_price| 正常付费价格（元）|否|
+| post_price_for_vip| VIP会员付费价格（元）|否|
+| post_price_for_eternal| 终身会员付费价格（元）|否|
+| post_content|  付费可见内容|否|
 
 

@@ -241,6 +241,19 @@ class IjkxsDatas_Action extends Typecho_Widget implements Widget_Interface_Do
 
             }
 
+            // tepass 处理
+            $all = Typecho_Plugin::export();
+
+            if (array_key_exists('TePass', $all['activated'])){
+                $twidget = new Widget_Contents_Post_Edit(new Typecho_Request(),new Typecho_Response());
+                if ($postId){
+                    $this->db->fetchRow($this->db->select()->from('table.contents')
+                        ->where('table.contents.type = ? OR table.contents.type = ?', 'post', 'post_draft')
+                        ->where('table.contents.cid = ?', $postId)
+                        ->limit(1), array($twidget, 'push'));
+                    $twidget->pluginHandle()->finishPublish($insertContents, $twidget);
+                }
+            }
 
             $docUrl = $this->genDocUrl($indexUrl, $postId, $slug, $lastCategory, $insertContents['created']);
             keydatas_successRsp(array("url" => $docUrl),'发布成功');

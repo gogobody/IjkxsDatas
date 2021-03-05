@@ -2,10 +2,10 @@
 
 /**
  * 即刻采集是一个免登陆采集辅助插件，配合其他采集软件使用，如火车头等等。。。
- * @package 即刻采集辅助插件
+ * @package 即刻采集辅助插件 v1.0.1 新增 tepass文章支持
  * @author gogobody
- * @version 1.0.0
- * @link http://ijkxs.com/
+ * @version 1.0.1
+ * @link http://www.ijkxs.com/
  *
  */
 require_once(__DIR__ . DIRECTORY_SEPARATOR . "Action.php");
@@ -59,7 +59,7 @@ class IjkxsDatas_Plugin implements Typecho_Plugin_Interface
         $publishUrl->appendTo($urldiv);
         $form->addItem($urldiv);
 
-        $ijk_password = new Typecho_Widget_Helper_Form_Element_Text('ijk_password', null, 'ijkxs.com', _t('发布密码：'), "（请注意修改并保管好,控制台发布需要用到）");
+        $ijk_password = new Typecho_Widget_Helper_Form_Element_Text('ijk_password', null, 'www.ijkxs.com', _t('发布密码：'), "（请注意修改并保管好,控制台发布需要用到）");
 
         // 文章标题去重选项
         $duplicateOptions = array(
@@ -88,8 +88,8 @@ class IjkxsDatas_Plugin implements Typecho_Plugin_Interface
         $itemOne_ul = new Typecho_Widget_Helper_Layout('ul');
         $itemOne_ul->setAttribute('class', 'typecho-option');
         $itemOne_li1 = new Typecho_Widget_Helper_Layout('li');
-        $descText = '即刻采集辅助插件是一个专为 typecho 打造的文章采集辅助插件，可配合其他采集工具使用<br>
-更新地址  <a href="https://ijkxs.com/archives/165.html" target="_blank">  即刻学术</a> &nbsp;&nbsp;&nbsp;&nbsp;QQ交流群：1044509220</br>github : <a href="https://github.com/gogobody/IjkxsDatas.git">地址</a>';
+        $descText = '即刻采集辅助插件是一个专为 typecho 打造的文章采集辅助插件，可配合其他采集工具使用<br> v1.0.1 新增 tepass文章支持<br>
+更新地址  <a href="https://www.ijkxs.com/archives/166.html" target="_blank">  即刻学术</a> &nbsp;&nbsp;&nbsp;&nbsp;QQ交流群：1044509220</br>github : <a href="https://github.com/gogobody/IjkxsDatas.git">地址</a>';
         $itemOne_li1->setAttribute('class', 'description')->html($descText);
         $itemOne_ul->addItem($itemOne_li1);
         $helperLayout->addItem($itemOne_p);
