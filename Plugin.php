@@ -89,7 +89,7 @@ class IjkxsDatas_Plugin implements Typecho_Plugin_Interface
         $itemOne_ul->setAttribute('class', 'typecho-option');
         $itemOne_li1 = new Typecho_Widget_Helper_Layout('li');
         $descText = '即刻采集辅助插件是一个专为 typecho 打造的文章采集辅助插件，可配合其他采集工具使用<br> v1.0.1 新增 tepass文章支持<br>
-更新地址  <a href="https://www.ijkxs.com/archives/166.html" target="_blank">  即刻学术</a> &nbsp;&nbsp;&nbsp;&nbsp;QQ交流群：1044509220</br>github : <a href="https://github.com/gogobody/IjkxsDatas.git">地址</a>';
+更新地址  <a href="https://www.ijkxs.com/166.html" target="_blank">  即刻学术</a> &nbsp;&nbsp;&nbsp;&nbsp;QQ交流群：1044509220</br>github : <a href="https://github.com/gogobody/IjkxsDatas.git">地址</a>';
         $itemOne_li1->setAttribute('class', 'description')->html($descText);
         $itemOne_ul->addItem($itemOne_li1);
         $helperLayout->addItem($itemOne_p);
