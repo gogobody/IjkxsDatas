@@ -45,7 +45,7 @@ v1.0.1 新增 teapass 支持
 | categories  | 分类名称，多个可,分隔，不存在会自动创建 |是|
 | title  | 标题 |是|
 | text| 内容 |是|
-| tag| 标签，多个可,分隔，不存在会自动创建|否|
+| tags| 标签，多个可,分隔，不存在会自动创建|否|
 | created| 创建时间戳|否|
 | __ijk_download_imgs_flag  | 是否下载图片 |否|
 | __ijk_docImgs  | 图片链接，多个链接用,分隔|否|
