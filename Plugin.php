@@ -80,6 +80,12 @@ class IjkxsDatas_Plugin implements Typecho_Plugin_Interface
             ['replace_img'], _t('本地图片替换:'));
         $form->addInput($replace_img);
 
+        $baidu_push_url = new Typecho_Widget_Helper_Form_Element_Text('baidu_push_url', null, '', '百度普通推送链接', "百度推送完整链接");
+        $form->addInput($baidu_push_url);
+
+        $random_imgs = new Typecho_Widget_Helper_Form_Element_Textarea('random_imgs', null, '', '随机图片api', "随机图片api，可以多个，用||分隔");
+        $form->addInput($random_imgs);
+
         $helperLayout = new Typecho_Widget_Helper_Layout();
         $itemOne_p = new Typecho_Widget_Helper_Layout('span', array(
             'style' => "floal:left;display:block;clear:left;margin-top:10px;"

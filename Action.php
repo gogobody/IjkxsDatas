@@ -1,5 +1,6 @@
 <?php
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
+require_once 'Baidu.php';
 
 class IjkxsDatas_Action extends Typecho_Widget implements Widget_Interface_Do
 {
@@ -21,9 +22,10 @@ class IjkxsDatas_Action extends Typecho_Widget implements Widget_Interface_Do
         $this->db = Typecho_Db::get();
         $wpdb = $this->db;
         $reqData = $this->IjkdatasMergeRequest();
-
+         
         $plugin_options = Typecho_Widget::widget('Widget_Options')->plugin('IjkxsDatas');
         if ($_GET["__ijk_flag"] == "post") {
+        
             //输出测试日志
             //error_log('title:'.$reqData["title"].PHP_EOL,3,'/www/wwwroot/typecho.simpledatas.com/usr/plugins/KeyDatas/test.log');
             //error_log('ijk_password:'.$reqData['ijk_password'].PHP_EOL,3,'/www/wwwroot/typecho.simpledatas.com/usr/plugins/KeyDatas/test.log');
@@ -105,6 +107,17 @@ class IjkxsDatas_Action extends Typecho_Widget implements Widget_Interface_Do
                     }
                 }
             }
+            $param3 = '/<[img|IMG].*?src=[\'|\"](.*?(?:[\.gif|\.jpg|\.jpeg|\.png]))[\'|\"].*?[\/]?>/';
+
+            if (!preg_match_all($param3, $text,$matches)) {
+                //
+                $randimgs = $plugin_options->random_imgs;
+                $randimgs_arr = explode('||', $randimgs);
+                if (count($randimgs_arr) > 0 and !empty($randimgs_arr[0])) {
+                    $r_img = $randimgs_arr[rand(0, count($randimgs_arr)-1)];
+                    $text = "<img src='$r_img'>".$text;
+                }
+            }
 
             //插入到文章表相应字段中
             $insertContents = array(
@@ -165,16 +178,9 @@ class IjkxsDatas_Action extends Typecho_Widget implements Widget_Interface_Do
                         //分类不存在则创建
                         $metaCate = $this->isCateExist($cates[$c], $allCates);
                         $cateId = $metaCate[0];
+                        
                         if (!$metaCate) {
-                            $cateId = $wpdb->query($wpdb->insert('table.metas')
-                                ->rows(array(
-                                    'name' => $cates[$c],
-                                    'slug' => Typecho_Common::slugName($cates[$c]),
-                                    'type' => 'category',
-                                    'count' => 1,
-                                    'order' => 1,
-                                    'parent' => 0
-                                )));
+                            keydatas_failRsp('1405', 'add category error', '分类不存在');
                         } else {
                             //更新分类对应的文章数量
                             $update = $wpdb->update('table.metas')->rows(array('count' => ($metaCate[2] + 1)))->where('mid=?', $metaCate[0]);
@@ -183,6 +189,7 @@ class IjkxsDatas_Action extends Typecho_Widget implements Widget_Interface_Do
                         try {
                             //插入关联分类和文章
                             $wpdb->query($wpdb->insert('table.relationships')->rows(array('cid' => $postId, 'mid' => $cateId)));
+                            
                         } catch (Exception $e) {
                             keydatas_failRsp('1405', 'add category error', '新增文章分类错误');
                         }
@@ -199,7 +206,7 @@ class IjkxsDatas_Action extends Typecho_Widget implements Widget_Interface_Do
                     )));
             }
 
-
+            
             //标签
             $reqTags = $reqData["tags"];
             $lastTag = "default";
@@ -256,6 +263,7 @@ class IjkxsDatas_Action extends Typecho_Widget implements Widget_Interface_Do
             }
 
             $docUrl = $this->genDocUrl($indexUrl, $postId, $slug, $lastCategory, $insertContents['created']);
+            Baidu::push($docUrl);
             keydatas_successRsp(array("url" => $docUrl),'发布成功');
 
         }
@@ -264,6 +272,7 @@ class IjkxsDatas_Action extends Typecho_Widget implements Widget_Interface_Do
             //显示分类
             foreach ($cates as $f => $v) {
                 echo "<<<".$v['mid'] . "==" . $v['name'].">>><br>";
+                // echo "<<<".$v['name'] . "==" . $v['mid'].">>><br>";
             }
             exit();
         }
@@ -529,11 +538,11 @@ class IjkxsDatas_Action extends Typecho_Widget implements Widget_Interface_Do
         return $tagsArr;
     }
 
-    //通过分类名判断分类是否存在
+    //通过分类mid判断分类是否存在
     public function isCateExist($cate, $allCates)
     {
         foreach ($allCates as $m) {
-            if ($m[1] == $cate) {
+            if ($m[0] == $cate) {
                 return $m;
             }
         }
